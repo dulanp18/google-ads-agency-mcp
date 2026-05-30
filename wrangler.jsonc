@@ -1,0 +1,38 @@
+{
+  "name": "google-ads-agency-mcp",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-04-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Durable Objects for stateful MCP sessions
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "MCP_OBJECT",
+        "class_name": "GoogleAdsMCP"
+      }
+    ]
+  },
+
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["GoogleAdsMCP"]
+    }
+  ],
+
+  // KV namespace for OAuth state (uncomment after creating with `wrangler kv namespace create OAUTH_KV`)
+  // "kv_namespaces": [
+  //   {
+  //     "binding": "OAUTH_KV",
+  //     "id": "YOUR_KV_NAMESPACE_ID"
+  //   }
+  // ]
+
+  // Secrets (set via `wrangler secret put`):
+  // - GOOGLE_ADS_DEVELOPER_TOKEN
+  // - GOOGLE_CLIENT_ID
+  // - GOOGLE_CLIENT_SECRET
+  // - GOOGLE_REFRESH_TOKEN
+  // - GOOGLE_ADS_LOGIN_CUSTOMER_ID (your MCC account ID)
+}

@@ -1,0 +1,5 @@
+GOOGLE_ADS_DEVELOPER_TOKEN=your-developer-token-here
+GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-client-secret-here
+GOOGLE_REFRESH_TOKEN=your-refresh-token-here
+GOOGLE_ADS_LOGIN_CUSTOMER_ID=1234567890
