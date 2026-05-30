@@ -1,6 +1,6 @@
 import type { Env, GoogleAdsTokenResponse, GoogleAdsSearchResponse, CustomerInfo } from "./types.js";
 
-const GOOGLE_ADS_API_VERSION = "v19";
+const GOOGLE_ADS_API_VERSION = "v20";
 const GOOGLE_ADS_BASE_URL = `https://googleads.googleapis.com/${GOOGLE_ADS_API_VERSION}`;
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 
