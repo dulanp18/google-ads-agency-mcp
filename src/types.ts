@@ -6,6 +6,7 @@ export interface Env {
   GOOGLE_CLIENT_SECRET: string;
   GOOGLE_REFRESH_TOKEN: string;
   GOOGLE_ADS_LOGIN_CUSTOMER_ID: string;
+  MCP_SECRET_TOKEN: string;
 }
 
 export interface GoogleAdsTokenResponse {

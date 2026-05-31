@@ -160,11 +160,6 @@ export default {
         JSON.stringify({
           name: "Google Ads Agency MCP Server",
           version: "1.0.0",
-          description: "MCP server for querying Google Ads data across multiple client accounts",
-          endpoints: {
-            mcp: "/mcp",
-            sse: "/sse",
-          },
         }),
         {
           headers: { "Content-Type": "application/json" },
@@ -172,12 +167,39 @@ export default {
       );
     }
 
-    if (url.pathname === "/mcp" || url.pathname.startsWith("/mcp/")) {
-      return GoogleAdsMCP.serve("/mcp").fetch(request, env, ctx);
+    // Secret token path: /mcp/{secret}/...
+    // The token is the first path segment after /mcp/
+    const mcpMatch = url.pathname.match(/^\/mcp\/([^/]+)(\/.*)?$/);
+    if (mcpMatch) {
+      const token = mcpMatch[1];
+      if (token !== env.MCP_SECRET_TOKEN) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+      // Rewrite the URL to strip the token so the MCP handler sees /mcp/...
+      const innerPath = mcpMatch[2] || "";
+      const rewrittenUrl = new URL(`/mcp${innerPath}`, url.origin);
+      rewrittenUrl.search = url.search;
+      const rewrittenRequest = new Request(rewrittenUrl, request);
+      return GoogleAdsMCP.serve("/mcp").fetch(rewrittenRequest, env, ctx);
     }
 
-    if (url.pathname === "/sse" || url.pathname.startsWith("/sse/")) {
-      return GoogleAdsMCP.serveSSE("/sse").fetch(request, env, ctx);
+    // Also handle /sse/{secret}/... for SSE transport
+    const sseMatch = url.pathname.match(/^\/sse\/([^/]+)(\/.*)?$/);
+    if (sseMatch) {
+      const token = sseMatch[1];
+      if (token !== env.MCP_SECRET_TOKEN) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+      const innerPath = sseMatch[2] || "";
+      const rewrittenUrl = new URL(`/sse${innerPath}`, url.origin);
+      rewrittenUrl.search = url.search;
+      const rewrittenRequest = new Request(rewrittenUrl, request);
+      return GoogleAdsMCP.serveSSE("/sse").fetch(rewrittenRequest, env, ctx);
+    }
+
+    // Reject bare /mcp or /sse without a token
+    if (url.pathname === "/mcp" || url.pathname === "/sse") {
+      return new Response("Unauthorized - token required", { status: 401 });
     }
 
     return new Response("Not Found", { status: 404 });
