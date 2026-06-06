@@ -70,7 +70,13 @@ GOOGLE_ADS_DEVELOPER_TOKEN=your-developer-token
 GOOGLE_REFRESH_TOKEN=your-refresh-token
 GOOGLE_ADS_LOGIN_CUSTOMER_ID=your-mcc-id-without-dashes
 MCP_SECRET_TOKEN=generate-a-random-string-here
+ALLOWED_CUSTOMER_IDS=your-permitted-customer-ids-comma-separated
 ```
+
+`ALLOWED_CUSTOMER_IDS` locks the server to specific Google Ads accounts. Both `search` and
+`list_accessible_customers` will only ever touch accounts in this list, regardless of what
+the MCC can reach. Dashes are optional, and multiple IDs are comma-separated (e.g.
+`1234567890,0987654321`). **If this is empty or unset, all account access is denied.**
 
 To generate a secure random token for `MCP_SECRET_TOKEN`:
 
@@ -136,6 +142,7 @@ echo "your-developer-token" | npx wrangler secret put GOOGLE_ADS_DEVELOPER_TOKEN
 echo "your-refresh-token" | npx wrangler secret put GOOGLE_REFRESH_TOKEN
 echo "your-mcc-id" | npx wrangler secret put GOOGLE_ADS_LOGIN_CUSTOMER_ID
 echo "your-secret-token" | npx wrangler secret put MCP_SECRET_TOKEN
+echo "1234567890,0987654321" | npx wrangler secret put ALLOWED_CUSTOMER_IDS
 ```
 
 ### Verify deployment

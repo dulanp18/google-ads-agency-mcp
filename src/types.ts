@@ -7,6 +7,10 @@ export interface Env {
   GOOGLE_REFRESH_TOKEN: string;
   GOOGLE_ADS_LOGIN_CUSTOMER_ID: string;
   MCP_SECRET_TOKEN: string;
+  // Comma-separated list of Google Ads customer IDs the tools are allowed to
+  // access (dashes optional). Locks the server to these accounts regardless of
+  // what the MCC can reach. If empty/unset, all account access is denied.
+  ALLOWED_CUSTOMER_IDS: string;
 }
 
 export interface GoogleAdsTokenResponse {

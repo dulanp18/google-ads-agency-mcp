@@ -4,3 +4,4 @@ GOOGLE_CLIENT_SECRET=your-client-secret-here
 GOOGLE_REFRESH_TOKEN=your-refresh-token-here
 GOOGLE_ADS_LOGIN_CUSTOMER_ID=1234567890
 MCP_SECRET_TOKEN=generate-with-python3-c-import-secrets-print-secrets.token_urlsafe-32
+ALLOWED_CUSTOMER_IDS=1234567890,0987654321

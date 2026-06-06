@@ -160,5 +160,6 @@ Data returned → Claude formats the answer
 
 - Credentials are stored as Cloudflare Worker secrets (encrypted at rest)
 - The server uses OAuth 2.0 to authenticate with Google Ads
+- `ALLOWED_CUSTOMER_IDS` restricts all tools to a fixed set of accounts; access to any account not on the list is denied (and an empty/unset list denies everything)
 - For production, consider adding authentication to the MCP endpoint itself
 - On Team/Enterprise Claude plans, only Owners can add custom connectors
