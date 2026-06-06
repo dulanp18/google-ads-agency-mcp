@@ -4,6 +4,26 @@ const GOOGLE_ADS_API_VERSION = "v20";
 const GOOGLE_ADS_BASE_URL = `https://googleads.googleapis.com/${GOOGLE_ADS_API_VERSION}`;
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 
+/** Strip everything but digits so "123-456-7890" and "1234567890" compare equal. */
+export function normalizeCustomerId(id: string): string {
+  return id.replace(/\D/g, "");
+}
+
+/** Parse ALLOWED_CUSTOMER_IDS into a Set of normalised customer IDs. */
+export function getAllowedCustomerIds(env: Env): Set<string> {
+  return new Set(
+    (env.ALLOWED_CUSTOMER_IDS || "")
+      .split(",")
+      .map((id) => normalizeCustomerId(id))
+      .filter((id) => id.length > 0)
+  );
+}
+
+/** True only when the allowlist is configured and contains the given ID. */
+export function isAllowedCustomer(env: Env, id: string): boolean {
+  return getAllowedCustomerIds(env).has(normalizeCustomerId(id));
+}
+
 export class GoogleAdsClient {
   private env: Env;
   private accessToken: string | null = null;
@@ -50,14 +70,14 @@ export class GoogleAdsClient {
     };
 
     if (this.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID) {
-      headers["login-customer-id"] = this.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID.replace(/-/g, "");
+      headers["login-customer-id"] = normalizeCustomerId(this.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID);
     }
 
     return fetch(url, { ...options, headers });
   }
 
   async search(customerId: string, query: string, pageSize?: number): Promise<GoogleAdsSearchResponse> {
-    const cleanId = customerId.replace(/-/g, "");
+    const cleanId = normalizeCustomerId(customerId);
     const url = `${GOOGLE_ADS_BASE_URL}/customers/${cleanId}/googleAds:searchStream`;
 
     const body: Record<string, unknown> = { query };

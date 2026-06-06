@@ -1,7 +1,12 @@
 import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { GoogleAdsClient } from "./google-ads-client.js";
+import {
+  GoogleAdsClient,
+  getAllowedCustomerIds,
+  isAllowedCustomer,
+  normalizeCustomerId,
+} from "./google-ads-client.js";
 import type { Env } from "./types.js";
 
 type State = Record<string, never>;
@@ -34,6 +39,17 @@ export class GoogleAdsMCP extends McpAgent<Env, State, Props> {
         ),
       },
       async ({ customer_id, query, page_size }) => {
+        if (!isAllowedCustomer(this.env, customer_id)) {
+          return {
+            content: [
+              {
+                type: "text" as const,
+                text: `Access denied: customer ${normalizeCustomerId(customer_id)} is not in the permitted account list.`,
+              },
+            ],
+            isError: true,
+          };
+        }
         try {
           const result = await client.search(customer_id, query, page_size);
           const rows = result.results || [];
@@ -68,11 +84,23 @@ export class GoogleAdsMCP extends McpAgent<Env, State, Props> {
         "Use this first to discover which client accounts are available.",
       {},
       async () => {
+        const allowed = getAllowedCustomerIds(this.env);
+        if (allowed.size === 0) {
+          return {
+            content: [
+              {
+                type: "text" as const,
+                text: "Access denied: no permitted accounts are configured (ALLOWED_CUSTOMER_IDS is empty).",
+              },
+            ],
+            isError: true,
+          };
+        }
         try {
           const resourceNames = await client.listAccessibleCustomers();
-          const customerIds = resourceNames.map((rn) =>
-            rn.replace("customers/", "")
-          );
+          const customerIds = resourceNames
+            .map((rn) => rn.replace("customers/", ""))
+            .filter((id) => allowed.has(normalizeCustomerId(id)));
 
           const details = await Promise.allSettled(
             customerIds.map((id) => client.getCustomerDetails(id))
